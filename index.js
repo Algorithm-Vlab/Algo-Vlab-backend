@@ -19,12 +19,14 @@ app.use(express.static(path.join(__dirname, "public")));
 app.use(cors({ credentials: true, origin: process.env.frontEndLink }));
 connectDB();
 
+app.get("/dbdb/yo", () => {
 
+})
 app.use("/y/user", userRoutes);
 app.use("/y/admin", adminRoutes);
 
 app.get("/", (req, res) => {
-    res.send("Hello User");
+    res.send("Hello User " + process.env.frontEndLink);
 })
 
 app.listen(port, () => {
