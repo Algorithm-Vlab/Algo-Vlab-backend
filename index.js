@@ -16,7 +16,7 @@ const port = 5013;
 app.use(cookieParser());
 app.use(bodyParser.json());
 app.use(express.static(path.join(__dirname, "public")));
-app.use(cors({ exposedHeaders: ["FileName"] }));
+app.use(cors({ credentials: true, origin: process.env.frontEndLink }));
 connectDB();
 
 app.get("/dbdb/yo", () => {
