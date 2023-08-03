@@ -26,7 +26,7 @@ app.use("/y/user", userRoutes);
 app.use("/y/admin", adminRoutes);
 
 app.get("/", (req, res) => {
-    res.send("Hello User " + process.env.frontEndLink);
+    res.send("Hello User " + process.env.frontEndLink + " yoo");
 })
 
 app.listen(port, () => {
