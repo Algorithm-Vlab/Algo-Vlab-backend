@@ -2,7 +2,7 @@ const mongoose = require("mongoose");
 
 const connectDB = async () => {
     try {
-        await mongoose.connect("mongodb://localhost:27017/dbAoaVlab", {
+        await mongoose.connect(process.env.DB_URL, {
             useNewUrlParser: true,
         });
         console.log("Database connected");
