@@ -1,3 +1,6 @@
+// This file is about the user controllers. It contains the functions for user registration, login, fetching user details, filling feedback, logging out, verifying user, requesting password change, changing password, and updating the algorithms performed by the user. The functions are exported to be used in the routes file.
+
+// Required Imports
 const dotenv = require("dotenv");
 dotenv.config();
 const User = require("../models/user");
@@ -10,10 +13,10 @@ const retDP = require("../dirP");
 const TempPass = require("../models/tempChangeP");
 const transporterV = require("../config/transporter");
 
-
+// Function to create a random token
 const createTVerf = () => {
     const referStrs = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'
-
+    // Down here we initialize a variable token with an empty string and a variable tCounter with a random number between 10 and 25. We then use a for loop to iterate over the tCounter value and add a random character from the referStrs string to the token variable. Finally, we return the token.
     let token = "";
     const tCounter = Math.floor(Math.random() * 15) + 10;
     for (var i = 0; i < tCounter; i++) {
@@ -22,11 +25,13 @@ const createTVerf = () => {
     return token;
 }
 
+// Function to check if the token exists
 const ttExists = async (tt) => {
     const tokenExists = await Tempuser.find({ tokeng: tt });
     return tokenExists;
 }
 
+// Function to check if the token exists
 const tverExits = async (req, res) => {
     const { token } = req.body;
     // console.log(token);
@@ -39,6 +44,7 @@ const tverExits = async (req, res) => {
     }
 }
 
+// Function to register a user
 const RegisterUser = async (req, res) => {
     const { name, email, username, password, institute, department, designation } = req.body;
     if (!name || !email || !username || !password) {
@@ -67,7 +73,7 @@ const RegisterUser = async (req, res) => {
     const hashedPassword = await bcrypt.hash(password, salt);
 
     const genTVer = createTVerf();
-
+    // Check if the user exists in the database
     try {
         const userReqPending = await Tempuser.findOne({ email });
         if (userReqPending) {
@@ -116,6 +122,7 @@ const RegisterUser = async (req, res) => {
 
 }
 
+// Function to verify the user
 const finallyRegU = async (req, res) => {
     const { token } = req.body;
     const userFound = await Tempuser.findOne({ tokeng: token });
@@ -147,6 +154,7 @@ const finallyRegU = async (req, res) => {
     }
 }
 
+//  Function to request a password change
 const ReqPasswordChange = async (req, res) => {
     const { email } = req.body;
     const genTVer = createTVerf();
@@ -193,6 +201,7 @@ const ReqPasswordChange = async (req, res) => {
     }
 }
 
+// Function to check if the change password link exists
 const cpExists = async (req, res) => {
     const { cpToken } = req.body;
     try {
@@ -209,6 +218,7 @@ const cpExists = async (req, res) => {
 
 }
 
+// Function to change the password
 const changePassword = async (req, res) => {
     const { email, password } = req.body;
     try {
@@ -223,12 +233,16 @@ const changePassword = async (req, res) => {
 
 }
 
+//  Function to login a user
 const LoginUser = async (req, res) => {
+    //  check if the email and password are provided
     const { email, password } = req.body;
     if (!email || !password) {
         res.status(402).json({ error: ["Please fill all fields"] });
     }
     const userExists = await User.findOne({ email: email, isAdmin: false });
+    
+    // check if the user exists
     if (userExists) {
         if (await bcrypt.compare(password, userExists.password)) {
             try {
@@ -258,6 +272,7 @@ const LoginUser = async (req, res) => {
 
 }
 
+// Function to logout a user
 const Logout = async (req, res) => {
     try {
         // res.clearCookie('ttoken');
@@ -271,8 +286,10 @@ const Logout = async (req, res) => {
 
 }
 
+// Function to fetch the user details
 const fetchUser = async (req, res) => {
     try {
+        // feeds is an array of feedbacks
         const feeds = await Feedback.find({ userId: req.user._id });
         let feedP = [];
         await feeds.map((fe) => {
@@ -302,7 +319,10 @@ const fetchUser = async (req, res) => {
 
 }
 
+// Function to fill the feedback
 const fillFeed = async (req, res) => {
+
+    //  check if the fields are provided
     const { algoName, institute, department, designation, dateP, q1, q2, q3, q4, q5, q6, q7 } = req.body;
     if (!algoName || !q1 || !q2 || !q3 || !q4 || !q5) {
         res.status(402).json({ "error": ["Please fill all fields!"] });
@@ -335,6 +355,7 @@ const fillFeed = async (req, res) => {
 
 }
 
+// Function to update the algorithms performed by the user
 const algoP = async (req, res) => {
     const { algoName } = req.body;
     try {
@@ -357,6 +378,7 @@ const algoP = async (req, res) => {
 
 }
 
+// Export the functions
 module.exports = {
     RegisterUser, LoginUser, fetchUser,
     fillFeed, Logout, finallyRegU, algoP, tverExits,

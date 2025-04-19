@@ -1,6 +1,9 @@
+// This file contains the middleware function to authorize the user as admin
+// Required Libraries
 const jwt = require("jsonwebtoken");
 const User = require("../models/user");
 
+// Function to authorize the admin
 const authorize = async (req, res, next) => {
     if (req.headers.cookie) {
         var token = req.headers.cookie.split("ttoken=")[1];
