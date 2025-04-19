@@ -1,3 +1,6 @@
+// This file contains the controllers for the admin functionalities.
+
+// Required Imports
 const User = require("../models/user");
 const Feedback = require("../models/feedback");
 const bcrypt = require("bcrypt");
@@ -9,11 +12,15 @@ const nodemailer = require("nodemailer");
 const TempPass = require("../models/tempChangeP");
 const transporterV = require("../config/transporter");
 
+// Function to login the admin
 const LoginAdmin = async (req, res) => {
+    //  Check if the email and password fields are empty
     const { email, password } = req.body;
     if (!email || !password) {
         return res.status(402).json({ error: ["Please fill all fields"] });
     }
+
+    // Check if the user exists in the database
     try {
         const userExists = await User.findOne({ email: email, isAdmin: true });
         if (userExists) {
@@ -47,7 +54,9 @@ const LoginAdmin = async (req, res) => {
 
 }
 
+// Function to create a random token
 const createTVerf = () => {
+    //  Function to create a random token
     const referStrs = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'
 
     let token = "";
@@ -58,6 +67,7 @@ const createTVerf = () => {
     return token;
 }
 
+// Function to register the admin
 const RegisterAdmin = async (req, res) => {
     const { name, email, username, password, secretK, institute, department,
         designation } = req.body;
@@ -79,8 +89,10 @@ const RegisterAdmin = async (req, res) => {
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
 
+    //  Function to create a random token
     const genTVer = createTVerf();
 
+    // Check if the user exists in the database
     try {
         const userReqPending = await Tempuser.findOne({ email });
         if (userReqPending) {
@@ -115,6 +127,7 @@ const RegisterAdmin = async (req, res) => {
             },
         }
 
+        // Send the mail
         if (newUser) {
             transporterV.sendMail(mailConfigs, async function (err, result) {
                 if (err) {
@@ -136,7 +149,9 @@ const RegisterAdmin = async (req, res) => {
 
 }
 
+// Function to fetch the feedbacks
 const adminDash = async (req, res) => {
+    // try and catch block to fetch the feedbacks
     try {
         const feedData = await Feedback.find({}, "-_id -__v")
             .populate("userId", "-_id -password -__v");
@@ -148,6 +163,7 @@ const adminDash = async (req, res) => {
 
 }
 
+//  Function to export the feedbacks
 const exportEx = async (req, res) => {
     var wb = XLSX.utils.book_new();
     try {
@@ -188,16 +204,19 @@ const exportEx = async (req, res) => {
     }
 }
 
+// Function to fetch the feedbacks for each user
 const fetchFeedForEUser = async (userId) => {
     const feeds = await Feedback.find({ userId });
     return feeds;
 }
 
+// Function to fetch the users
 const fetchUsers = async (req, res) => {
     try {
         const users = await User.find({ isAdmin: false }, "-password");
         if (users) {
             let newUL = [];
+            // Fetch the feedbacks for each user
             let dd = await Promise.all(users.map(async (usI, index) => {
                 var feeds = await fetchFeedForEUser(usI._id);
                 var feedP = [];
@@ -230,13 +249,16 @@ const fetchUsers = async (req, res) => {
 
 }
 
+// Function to fetch the admins
 const fetchAdmins = async (req, res) => {
     const isM = req.user.isMAdmin;
     if (!isM) {
         return res.status(402).json({ error: ["You can't access!"] });
     }
+    // Fetch the admins
     const users = await User.find({ isAdmin: true }, "-password");
     res.status(200).send(users);
 }
 
+// Export the functions
 module.exports = { LoginAdmin, RegisterAdmin, adminDash, exportEx, fetchUsers, fetchAdmins }

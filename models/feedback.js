@@ -1,5 +1,8 @@
+// This file contains the schema for the feedbacks given by the users to the algorithms
+//Importing required modules
 const mongoose = require("mongoose");
 
+//Creating the schema for the feedback
 const feedbackSchema = mongoose.Schema({
     userId: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
     institute: {type: String, required: true},
@@ -17,7 +20,7 @@ const feedbackSchema = mongoose.Schema({
 }, {
     timestampes: { createdAt: 'createdDate', updatedAt: 'updatedDate' }
 });
-
+//Creating the feedback model
 const feedback = mongoose.model("Feedback", feedbackSchema);
-
+//Exporting the feedback model
 module.exports = feedback;
